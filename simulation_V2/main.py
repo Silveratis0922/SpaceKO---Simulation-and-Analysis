@@ -1,5 +1,4 @@
 from Class import Tournament
-from data import data_collector
 import pandas as pd
 import time
 
@@ -8,24 +7,22 @@ def main():
     tournaments = 100
     players = 7500
     buy_in = 10
-    whole_data = []
+    all_events = []
     start = time.time()
     for i in range(tournaments):
         Spaceko = Tournament(i + 1, players, buy_in)
         # running tournament:
-        Spaceko.run()
+        event = Spaceko.run()
+        all_events.extend(event)
         # We have a winner !
         print(Spaceko.winner_annoncement(i + 1))
-        # Saving stats from players
-        df = data_collector(Spaceko, i + 1)
-        whole_data.append(df)
+        # DataFrame creation
+    df = pd.DataFrame([e.__dict__ for e in all_events])
+    df.to_parquet("events.parquet", index=False)
+    df = pd.read_parquet("events.parquet")
+    print(df.head())
     # Tournaments are finish.
-    # Concatanate the list of DataFrame into a single one
-    #df_all = pd.concat(whole_data, axis=1)
-    #df_all.to_csv(f"../data_{tournaments}t_{players}p_{pay_in}.csv")
     end = time.time()
-    # print("Donnees de tous les tournois :")
-    # print(df_all)
     print(f"Le programme a mit {round(end - start, 2)} secondes pour {tournaments} tournois.")
 
 

@@ -1,51 +1,15 @@
-from utils import simulator
+from Event import Event
+from data import tournament_info, bust_event, winner_event
 import random
 
 
 class Player():
     def __init__(self, name, entry) -> None:
         self.name = name
-        # self.entry = entry
-        # self.dotation = entry / 2
-        # self.gain = 0
-        # self.token_lvl = 1
-        # self.kill = 0
         self.eliminate = False
 
     def bust(self) -> None:
         self.eliminate = True
-
-    # def checking_token(self) -> None:
-    #     dotation = self.dotation
-    #     entry = self.entry
-    #     if dotation >= entry / 2 and dotation < entry * 0.6:
-    #         self.token_lvl = 1
-    #     elif dotation >= entry * 0.6 and dotation < entry * 0.75:
-    #         self.token_lvl = 2
-    #     elif dotation >= entry * 0.75 and dotation < entry:
-    #         self.token_lvl = 3
-    #     elif dotation >= entry and dotation < entry * 1.5:
-    #         self.token_lvl = 4
-    #     elif dotation >= entry * 1.5 and dotation < entry * 2.5:
-    #         self.token_lvl = 5
-    #     elif dotation >= entry * 2.5 and dotation < entry * 5:
-    #         self.token_lvl = 6
-    #     elif dotation >= entry * 5 and dotation < entry * 10:
-    #         self.token_lvl = 7
-    #     elif dotation >= entry * 10 and dotation < entry * 20:
-    #         self.token_lvl = 8
-    #     elif dotation >= entry * 20 and dotation < entry * 50:
-    #         self.token_lvl = 9
-    #     elif dotation >= entry * 50 and dotation < 10000:
-    #         self.token_lvl = 10
-    #     elif dotation >= 10000 and dotation < 100000:
-    #         self.token_lvl = 11
-    #     elif dotation >= 100000 and dotation < 333333:
-    #         self.token_lvl = 12
-    #     elif dotation >= 333333 and dotation < 500000:
-    #         self.token_lvl = 13
-    #     elif dotation >= 500000:
-    #         self.token_lvl = 14
 
     def __str__(self) -> str:
         if self.eliminate:
@@ -81,17 +45,18 @@ class Table():
 
 class Tournament():
     def __init__(self, id, nbr_player, buy_in) -> None:
-        self.tournament_id = id
+        self.id = id
+        self.event_id = 0
         self.nbr_player = nbr_player
         self.buy_in = buy_in
         self.players = self.create_players()
         self.tables = []
-        self.event_id = 0
         self.finish = False
+        self.events: list[Event] = []
 
     def create_players(self) -> list:
         return [
-            Player(f"Player {i + 1}", self.entry)
+            Player(f"Player {i + 1}", self.buy_in)
             for i in range(self.nbr_player)
             ]
 
@@ -111,22 +76,37 @@ class Tournament():
         for player in self.tables[0].players:
             if not player.eliminate:
                 return (
-                    f"Le gagnant du tourois est {player.name}. J'ai gagner "
-                    f"{player.gain:.2f} et eliminer {player.kill} joueurs. "
-                    f"🏆 {player.token_lvl}"
+                    f"Le gagnant du tourois est {player.name}."
                 )
 
-    def run(self) -> None:
-        
+    def run(self) -> list[Event]:
+        self.events.append(tournament_info(self))
+        self.event_id += 1
         while not self.finish:
             if self.nbr_player > 7:
                 self.create_tables()
             else:
                 self.create_tables(True)
             for table in self.tables:
-                if len(table.players) >= 2:
+                if len(table.players) > 1:
                     win, lost = random.sample(range(len(table.players)), 2)
-                    simulator(self, table.players[win], table.players[lost])
+                    self.simulator(table.players[win], table.players[lost])
+                else:
+                    self.simulator(self.tables[0].players[0])
+
+        return self.events
+
+    def simulator(self, p_winner, p_looser=None) -> Event:
+        if self.nbr_player > 1 and not p_looser == None: #Bust_event
+            event = bust_event(self, p_winner.name, p_looser.name)
+            self.events.append(event)
+            p_looser.bust()
+        elif self.nbr_player == 1: #Winner_event
+            event = winner_event(self, p_winner.name)
+            self.events.append(event)
+            self.end()
+        self.nbr_player -= 1
+        self.event_id += 1
 
     def end(self) -> str:
         self.finish = True
