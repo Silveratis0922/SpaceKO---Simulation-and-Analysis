@@ -91,7 +91,7 @@ class Tournament():
                 if len(table.players) > 1:
                     win, lost = random.sample(range(len(table.players)), 2)
                     self.simulator(table.players[win], table.players[lost])
-                else:
+                elif self.nbr_player == 1:
                     self.simulator(self.tables[0].players[0])
 
         return self.events

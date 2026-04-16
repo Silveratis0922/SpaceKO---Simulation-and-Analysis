@@ -20,7 +20,6 @@ def main():
     df = pd.DataFrame([e.__dict__ for e in all_events])
     df.to_parquet("events.parquet", index=False)
     df = pd.read_parquet("events.parquet")
-    print(df.head())
     # Tournaments are finish.
     end = time.time()
     print(f"Le programme a mit {round(end - start, 2)} secondes pour {tournaments} tournois.")

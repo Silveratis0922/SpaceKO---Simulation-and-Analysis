@@ -8,3 +8,4 @@ pyarrow==23.0.1
 minio==7.2.20
 
 pyspark==3.5.4
+setuptools==82.0.1 #PySpark a besoin de distutils

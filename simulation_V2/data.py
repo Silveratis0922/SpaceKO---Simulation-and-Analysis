@@ -11,7 +11,7 @@ def tournament_info(tournament) -> Event:
     return Event(
         tournament_id=tournament.id,
         event_id=tournament.event_id,
-        event_type="Tournament_info",
+        event_type="tournament_info",
         players=tournament.nbr_player,
         buy_in=tournament.buy_in
     )
@@ -23,7 +23,7 @@ def bust_event(tournament, p_win, p_loose) -> Event:
     return Event(
         tournament_id=tournament.id,
         event_id=event_id,
-        event_type="Bust event",
+        event_type="bust_event",
         winner=p_win,
         looser=p_loose,
         rng=rng,
@@ -36,7 +36,7 @@ def winner_event(tournament, p_win) -> Event:
     return Event(
         tournament_id=tournament.id,
         event_id=event_id,
-        event_type="Winner event",
+        event_type="winner_event",
         winner=p_win,
         rng=rng,
     )
