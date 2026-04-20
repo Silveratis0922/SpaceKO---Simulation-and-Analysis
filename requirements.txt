@@ -8,4 +8,8 @@ pyarrow==23.0.1
 minio==7.2.20
 
 pyspark==3.5.4
-setuptools==82.0.1 #PySpark a besoin de distutils
+
+dbt-core==1.11.8
+dbt-postgres==1.10.0
+sqlalchemy==2.0.49
+psycopg2-binary==2.9.11

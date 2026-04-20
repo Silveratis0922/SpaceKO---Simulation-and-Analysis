@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MINIO_ENDPOINT = "localhost:9000"
-PARQUET_SOURCE = "simulation_V2/events.parquet"
+MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT")
+PARQUET_SOURCE = os.getenv("PARQUET_SOURCE")
 BUCKET_NAME    = "bronze"
 OBJECT_NAME    = "tournaments/events.parquet"
 

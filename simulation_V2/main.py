@@ -1,7 +1,10 @@
 from Class import Tournament
+from dotenv import load_dotenv
 import pandas as pd
 import time
+import os
 
+load_dotenv()
 
 def main():
     tournaments = 100
@@ -18,8 +21,7 @@ def main():
         print(Spaceko.winner_annoncement(i + 1))
         # DataFrame creation
     df = pd.DataFrame([e.__dict__ for e in all_events])
-    df.to_parquet("events.parquet", index=False)
-    df = pd.read_parquet("events.parquet")
+    df.to_parquet(os.getenv("PARQUET_SOURCE"), index=False)
     # Tournaments are finish.
     end = time.time()
     print(f"Le programme a mit {round(end - start, 2)} secondes pour {tournaments} tournois.")
