@@ -7,7 +7,7 @@ import os
 load_dotenv()
 
 def main():
-    tournaments = 100
+    tournaments = 500
     players = 7500
     buy_in = 10
     all_events = []
