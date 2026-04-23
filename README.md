@@ -1,46 +1,83 @@
-# 🃏 Poker Tournament Simulator & End-to-End Data Platform
+# SpaceKO - Pipeline ETL Data End-to-End
 
-![Status](https://img.shields.io/badge/Status-Architecture_Refactor-orange)
-![Tech](https://img.shields.io/badge/Stack-Modern_Data_Stack-blue)
+![Status](https://img.shields.io/badge/Status-Terminé-green)
+![Python](https://img.shields.io/badge/Python-3.12-blue)
+![PySpark](https://img.shields.io/badge/PySpark-3.x-orange)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED)
+![Airflow](https://img.shields.io/badge/Apache_Airflow-2.9-017CEE)
+![dbt](https://img.shields.io/badge/dbt-1.x-FF694B)
+![Metabase](https://img.shields.io/badge/Metabase-v0.52-509EE3)
 
-## 🚧 Project Status: Major Architectural Refactoring
-The project is currently undergoing a complete migration from a **monolithic Python script** to a **decoupled, production-grade Data Engineering pipeline**. 
+## Description
 
-The goal is to move away from local DataFrame processing toward a scalable infrastructure using the **Modern Data Stack** (S3, SQL Warehouse, Containerization).
+Simulation de tournois SpaceKO (Winamax) et pipeline ETL complet pour répondre à une question analytique métier :
 
----
+> **La dotation réelle distribuée dépasse-t-elle la dotation estimée ?**
 
-## 🏗️ Target Architecture
-I am implementing a professional-grade data lifecycle to handle high-volume simulation results:
+## Architecture
 
+```mermaid
+flowchart LR
+    subgraph Simulation
+        A[Python Simulator\nPOO + Pandas]
+    end
 
+    subgraph MinIO - Data Lake
+        B[(Bronze\nevents.parquet)]
+        C[(Silver\nresults.parquet)]
+    end
 
-1. **Generation Layer:** Poker Simulator (Python) generating raw event data.
-2. **Landing Zone (Data Lake):** Raw ingestion into **MinIO** (S3-compatible Object Storage) via Boto3 API.
-3. **Processing Layer (ETL):** Automated transformation pipeline cleaning data and calculating KPIs (ROI, ITM%, Variance).
-4. **Storage Layer (Warehouse):** Structured storage in **PostgreSQL**.
-5. **Business Intelligence:** Interactive analytics dashboard built with **Streamlit** and **Matplotlib**.
-6. **Orchestration:** Entire stack containerized using **Docker & Docker Compose**.
+    subgraph Transformation
+        D[PySpark\ntournament_replayer]
+        E[dbt / SQL\nagrégations Gold]
+    end
 
----
+    subgraph PostgreSQL
+        F[(silver_results\npublic)]
+        G[(gold_results\ngold)]
+    end
 
-## 🛠️ Tech Stack (In Progress)
-* **Infrastructure:** Docker, Docker Compose
-* **Data Lake:** MinIO (AWS S3 Mock)
-* **Database:** PostgreSQL
-* **Processing:** Python / Pandas (Migrating to PySpark)
-* **Visualization:** Streamlit, Matplotlib, Seaborn
+    subgraph Visualisation
+        H[Metabase\nDashboards]
+    end
 
----
+    subgraph Orchestration
+        I[Apache Airflow\nspaceko_pipeline]
+    end
 
-## 📈 Roadmap & Milestones
-- [x] **Core Engine:** High-performance poker tournament simulation logic.
-- [🔄] **Infrastructure:** Setting up Dockerized environment (Postgres + MinIO).
-- [ ] **Data Ingestion:** Refactoring simulator to push raw CSVs to S3/MinIO.
-- [ ] **ETL Pipeline:** Developing the automated bridge between Data Lake and Warehouse.
-- [ ] **BI Dashboard:** Building the final Streamlit UI for variance analysis.
+    A -->|events.parquet| B
+    B --> D --> C
+    C --> F --> E --> G
+    G --> H
+    I -.->|orchestrate| A
+    I -.->|orchestrate| D
+    I -.->|orchestrate| E
+```
 
----
+## Stack technique
 
-## 🚀 Legacy Execution
-*Note: The instructions below apply to the initial version. The new Docker-based launch procedure will be updated soon.*
+| Couche | Technologie |
+|---|---|
+| Simulation | Python (POO), Pandas |
+| Data Lake | MinIO (S3-compatible), architecture Medallion |
+| Transformation | PySpark, dbt |
+| Orchestration | Apache Airflow |
+| Stockage | PostgreSQL |
+| Visualisation | Metabase |
+| Infrastructure | Docker, Docker Compose |
+
+## Lancer le projet
+
+```bash
+docker compose up -d 
+```
+Accès :
+
+- Airflow : http://localhost:8080
+- Metabase : http://localhost:3000
+- MinIO : http://localhost:9001
+
+## Dashboards
+
+![Dashboard 1](assets/Dashboard_1.png)
+![Dashboard 2](assets/Dashboard_2.png)
